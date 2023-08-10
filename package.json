@@ -4,10 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:template": "pnpm -r --filter templates dev"
+    "dev:template": "pnpm -r --filter templates dev",
+    "eslint": "eslint"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "husky": "^8.0.0"
+  }
 }
