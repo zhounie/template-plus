@@ -1,13 +1,16 @@
 {
-  "name": "create-vue3-template",
+  "name": "templates",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:template": "pnpm -r --filter templates dev"
+    "dev": ""
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "prompts": "^2.4.2"
+  }
 }
