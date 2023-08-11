@@ -1,19 +1,26 @@
 {
-  "name": "create-vue3-template",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:template": "pnpm -r --filter templates dev",
+    "dev:template": "pnpm -r --filter template-plus dev",
+    "build:template": "pnpm -r --filter template-plus build",
     "eslint": "eslint"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^20.4.9",
     "eslint": "^8.46.0",
-    "husky": "^8.0.0"
+    "husky": "^8.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "template-plus": "^1.0.1"
   }
 }

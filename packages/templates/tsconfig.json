@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module": "ES2020",
+        "moduleResolution": "NodeNext"
+    },
+    "include": ["build", "src"],
+    "exclude": []
+}
