@@ -8,6 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:template": "pnpm -r --filter template-plus dev",
     "build:template": "pnpm -r --filter template-plus build",
+    "dev:docs": "pnpm -r --filter docs dev",
+    "build:docs": "pnpm -r --filter docs build",
     "eslint": "eslint"
   },
   "keywords": [],
