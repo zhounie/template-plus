@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-import './dist/out.js'
+import './dist/index.mjs'

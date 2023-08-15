@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "ES2020",
-        "moduleResolution": "NodeNext"
+        "moduleResolution": "Bundler"
     },
     "include": ["build", "src"],
     "exclude": []

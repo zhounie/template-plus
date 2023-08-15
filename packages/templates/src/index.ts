@@ -1,9 +1,11 @@
 import prompts from 'prompts'
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import fsExtra from 'fs-extra'
+import chalk from 'chalk'
 
-const defaultProjectName = 'create-vue3-app'
+const defaultProjectName = 'template-plus'
 
 async function init() {
   let result = {
@@ -24,12 +26,10 @@ async function init() {
     console.log(error);
   }
 
-  // console.log(result); // => { value: 24 }
-
-  // console.log(__dirname);
-
-  const resourceDir = path.resolve(__dirname, '../', 'template-admin')
-  const targetDir = path.resolve(__dirname, result.projectName)
+  const root = process.cwd()
+  
+  const resourceDir = path.resolve(fileURLToPath(import.meta.url), '../../', 'template-admin')
+  const targetDir = path.resolve(root, result.projectName)
 
   // 复制文件夹
   fsExtra.copySync(resourceDir, targetDir)
@@ -40,8 +40,12 @@ async function init() {
   pkg.name = result.projectName
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), 'utf-8')
 
-  console.log(`cd ${result.projectName}`)
-  console.log(`npm install`);
+  // 更改ignore名称
+  const gitignore = path.resolve(targetDir, 'gitignore')
+  fs.renameSync(gitignore, path.resolve(targetDir, '.gitignore'))
+
+  console.log(chalk.greenBright.bold(`  cd ${result.projectName}`))
+  console.log(chalk.greenBright.bold(`  npm install`));
   
 }
 

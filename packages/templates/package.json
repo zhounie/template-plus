@@ -1,7 +1,7 @@
 {
   "name": "template-plus",
   "type": "module",
-  "version": "1.0.4",
+  "version": "1.1.1",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -9,13 +9,13 @@
   },
   "files": [
     "dist",
-    "template-*",
+    "template-admin",
     "index.js"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node ./src/index.ts",
-    "build": "node ./build/index.mjs"
+    "build": "unbuild"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +29,7 @@
     "esbuild": "^0.19.0",
     "fs-extra": "^11.1.1",
     "rollup": "^3.28.0",
-    "tslib": "^2.6.1"
+    "tslib": "^2.6.1",
+    "unbuild": "^1.2.1"
   }
 }
