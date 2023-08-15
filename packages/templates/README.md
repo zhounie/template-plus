@@ -37,4 +37,4 @@ Contributions are welcome! If you have any ideas or improvements, please open an
 
 ## License
 
-This project is licensed under the [MIT License](link-to-license).
+This project is licensed under the [MIT License]([link-to-license](https://github.com/zhounie/template-plus/blob/main/packages/templates/LICENSE)).
