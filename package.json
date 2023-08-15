@@ -1,7 +1,7 @@
 {
   "private": true,
   "version": "1.0.0",
-  "description": "",
+  "description": "template-plus is a toolkit for quickly building front-end engineering templates, simplifying the process of setting up project structures. It provides pre-configured templates, flexible configuration options, and automated tasks to help you kickstart your front-end development workflow.",
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
@@ -11,8 +11,8 @@
     "eslint": "eslint"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "zhounie",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.4.9",
     "eslint": "^8.46.0",
