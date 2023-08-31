@@ -10,6 +10,7 @@ import crossSpawn from 'cross-spawn'
 const root = process.cwd()
 
 const defaultProjectName = 'template-plus'
+let targetDir = path.resolve(root, defaultProjectName)
 
 // 合并package.json
 function mergePkg (pkg, targetPkg) {
@@ -19,27 +20,25 @@ function mergePkg (pkg, targetPkg) {
     } else if (Object.prototype.toString.call(targetPkg[key]) === '[object Object]') {
       if (Object.prototype.toString.call(targetPkg[key]) === '[object Object]') {
         targetPkg[key] = Object.assign(targetPkg[key], pkg[key])
-      } else {
-        targetPkg[key] = pkg[key]
       }
+    } else {
+      targetPkg[key] = pkg[key]
     }
   })
 }
 
-
-// 初始化lint-staged
-function initLintStaged (targetDir, pkg) {
-  const lintStagedDir = path.resolve(root, 'tools/lint-staged')
-  const lintStagedPkgPath = path.resolve(lintStagedDir, 'package.json')
-  const lintStagedPkg = JSON.parse(fs.readFileSync(lintStagedPkgPath, 'utf-8'))
-
-  console.log(chalk.blueBright("init lint-staged..."));
-  // pkg.scripts = Object.assign(pkg.scripts, lintStagedPkg.scripts)
-  // pkg.devDependencies = Object.assign(pkg.devDependencies, lintStagedPkg.devDependencies)
-  
-  mergePkg(lintStagedPkg, pkg)
-  console.log(chalk.blueBright("init lint-staged success."));
+function getToolPkg (name) {
+  const pkgPath = path.resolve(root, `tools/${name}/`, 'package.json')
+  return JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
 }
+
+function copyToolFile(name) {
+  const dir = path.resolve(root, `tools/${name}`, 'src')
+  if (fsExtra.existsSync(dir)) {
+    fsExtra.copySync(dir, targetDir)
+  }
+}
+
 
 function initGit(targetDir) {
   return new Promise((resolve, reject) => {
@@ -58,14 +57,8 @@ function initGit(targetDir) {
 }
 
 function initHusky(targetDir, pkg) {
-  const huskyDir = path.resolve(root, 'tools/husky')
-  const huskyPkgPath = path.resolve(huskyDir, 'package.json')
-  const huskyPkg = JSON.parse(fs.readFileSync(huskyPkgPath, 'utf-8'))
-  
+  const huskyPkg = getToolPkg('husky')
   mergePkg(huskyPkg, pkg)
-  // pkg.scripts = Object.assign(pkg.scripts, huskyPkg.scripts)
-  // pkg.devDependencies = Object.assign(pkg.devDependencies, huskyPkg.devDependencies)
-  
   const huskyInstallProcess = crossSpawn.sync('npx', ['husky', 'install'], {
     cwd: targetDir
   })
@@ -76,7 +69,7 @@ function initHusky(targetDir, pkg) {
     return rollback(targetDir)
   }
 
-  const childProcess = crossSpawn.sync('npx', ['husky', 'add', '.husky/pre-commit', 'npm lint-staged'], {
+  const childProcess = crossSpawn.sync('npx', ['husky', 'add', '.husky/pre-commit', 'npm run lint-staged'], {
     cwd: targetDir
   })
   if (childProcess.status === 0) {
@@ -87,60 +80,6 @@ function initHusky(targetDir, pkg) {
   }
 }
 
-
-function initPrettier(targetDir, pkg) {
-  const prettierDir = path.resolve(root, 'tools/prettier')
-  const prettierPkgPath = path.resolve(prettierDir, 'package.json')
-  const prettierPkg = JSON.parse(fs.readFileSync(prettierPkgPath, 'utf-8'))
-
-  console.log(chalk.blueBright("init prettier..."));
-
-  mergePkg(prettierPkg, pkg)
-  
-  // pkg.scripts = Object.assign(pkg.scripts, prettierPkg.scripts)
-  // pkg.devDependencies = Object.assign(pkg.devDependencies, prettierPkg.devDependencies)
-
-  fsExtra.copySync(path.resolve(prettierDir, 'src'), targetDir)
-
-  console.log(chalk.blueBright("init prettier success."));
-}
-
-function initEslint(targetDir, pkg) {
-  const eslintDir = path.resolve(root, 'tools/eslint')
-  const eslintPkgPath = path.resolve(eslintDir, 'package.json')
-  const eslintPkg = JSON.parse(fs.readFileSync(eslintPkgPath, 'utf-8'))
-
-  console.log(chalk.blueBright("init eslint..."));
-  
-  
-  mergePkg(eslintPkg, pkg)
-  
-  // pkg.scripts = Object.assign(pkg.scripts, eslintPkg.scripts)
-  // pkg.devDependencies = Object.assign(pkg.devDependencies, eslintPkg.devDependencies)
-
-  fsExtra.copySync(path.resolve(eslintDir, 'src'), targetDir)
-
-  console.log(chalk.blueBright("init eslint success."));
-}
-
-function initStylelint(targetDir, pkg) {
-  const stylelintDir = path.resolve(root, 'tools/stylelint')
-  const stylelintPkgPath = path.resolve(stylelintDir, 'package.json')
-  const stylelintPkg = JSON.parse(fs.readFileSync(stylelintPkgPath, 'utf-8'))
-
-  console.log(chalk.blueBright("init stylelint..."));
-  
-  
-  mergePkg(stylelintPkg, pkg)
-  
-  // pkg.scripts = Object.assign(pkg.scripts, stylelintPkg.scripts)
-  // pkg.devDependencies = Object.assign(pkg.devDependencies, stylelintPkg.devDependencies)
-
-  fsExtra.copySync(path.resolve(stylelintDir, 'src'), targetDir)
-
-  console.log(chalk.blueBright("init stylelint success."));
-}
-
 function rollback(dir) {
   fsExtra.removeSync(dir)
 }
@@ -148,7 +87,13 @@ function rollback(dir) {
 async function init() {
   let result = {
     projectName: '',
-    isHusky: true
+    normalized: true
+  }
+  let normalizedResult = {
+    isHusky: true,
+    isEslint: true,
+    isStyleLint: true,
+    isPrettier: true
   }
 
   const list = [
@@ -159,22 +104,69 @@ async function init() {
       initial: defaultProjectName,
     },
     {
+
+    },
+    {
+      
+    },
+    {
+      
+    },
+    {
+      name: 'normalized',
+      message: 'need Normalized code?',
+      type: 'toggle',
+      initial: result.normalized,
+      active: 'yes',
+      inactive: 'no'
+    }
+  ]
+
+  const normalizedList = [
+    {
+      name: 'isEslint',
+      message: 'need eslint?',
+      type: 'toggle',
+      initial: normalizedResult.isEslint,
+      active: 'yes',
+      inactive: 'no'
+    },
+    {
+      name: 'isStyleLint',
+      message: 'need style-lint?',
+      type: 'toggle',
+      initial: normalizedResult.isStyleLint,
+      active: 'yes',
+      inactive: 'no'
+    },
+    {
+      name: 'isPrettier',
+      message: 'need prettier?',
+      type: 'toggle',
+      initial: normalizedResult.isPrettier,
+      active: 'yes',
+      inactive: 'no'
+    },
+    {
       name: 'isHusky',
       message: 'need husky?',
       type: 'toggle',
-      initial: result.isHusky,
+      initial: normalizedResult.isHusky,
       active: 'yes',
       inactive: 'no'
     }
   ]
   try {
     result = await prompts(list);
+    if (result.normalized) {
+      normalizedResult = await prompts(normalizedList);
+    }
   } catch (error) {
     console.log(error);
   }
   
   const resourceDir = path.resolve(fileURLToPath(import.meta.url), '../../', 'template-admin')
-  const targetDir = path.resolve(root, result.projectName)
+  targetDir = path.resolve(root, result.projectName)
 
   // 复制文件夹
   fsExtra.copySync(resourceDir, targetDir)
@@ -184,27 +176,72 @@ async function init() {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"))
   pkg.name = result.projectName
 
-  
-  // 初始化git
-  try {
-    await initGit(targetDir)
-  } catch (error) {
-    console.log(chalk.redBright(error))
+  function initTool(name) {
+    console.log(chalk.blueBright(`init ${name}...`));
+    const prettierPkg = getToolPkg(name)
+    mergePkg(prettierPkg, pkg)
+    copyToolFile(name)
+    console.log(chalk.blueBright(`init ${name} success.`));
   }
 
-  initLintStaged(targetDir, pkg)
-  
+  // 初始化lint-staged
+  function initLintStaged (targetDir, pkg) {
+    console.log(chalk.blueBright("init lint-staged..."));
+    const lintStagedPkg = getToolPkg('lint-staged')
+    mergePkg(lintStagedPkg, pkg)
+    copyToolFile('lint-staged')
 
-  // 安装husky
-  if (result.isHusky) {
-    initHusky(targetDir, pkg)
+    // "*.{js,ts,vue}": [
+    //   "npm run eslint",
+    //   "npm run prettier"
+    // ],
+    // "*.{vue,css,scss}": [
+    //   "npm run stylelint"
+    // ]
+    if (normalizedResult.isEslint) {
+      if (Array.isArray(pkg['lint-staged']['*.{js,ts,vue}'])) {
+        pkg['lint-staged']['*.{js,ts,vue}'].push('npm run eslint')
+      } else {
+        pkg['lint-staged']['*.{js,ts,vue}'] = ['npm run eslint']
+      }
+    }
+    if (normalizedResult.isPrettier) {
+      if (Array.isArray(pkg['lint-staged']['*.{js,ts,vue}'])) {
+        pkg['lint-staged']['*.{js,ts,vue}'].push('npm run prettier')
+      } else {
+        pkg['lint-staged']['*.{js,ts,vue}'] = ['npm run prettier']
+      }
+    }
+    if (normalizedResult.isStyleLint) {
+      pkg['lint-staged']['*.{vue,css,scss}'] = ['npm run stylelint']
+    }
+    console.log(chalk.blueBright("init lint-staged success."));
   }
 
-  initPrettier(targetDir, pkg)
+  if (result.normalized) {
+    if (normalizedResult.isPrettier) {
+      initTool('prettier')
+    }
 
-  initEslint(targetDir, pkg)
+    if (normalizedResult.isEslint) {
+      initTool('eslint')
+    }
 
-  initStylelint(targetDir, pkg)
+    if (normalizedResult.isStyleLint) {
+      initTool('stylelint')
+    }
+
+    if (normalizedResult.isHusky) {
+      // 初始化git
+      try {
+        await initGit(targetDir)
+      } catch (error) {
+        console.log(chalk.redBright(error))
+      }
+      initHusky(targetDir, pkg)
+      initLintStaged(targetDir, pkg)
+    }
+  }
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), 'utf-8')
 
@@ -220,5 +257,6 @@ async function init() {
 
 
 init().catch((err) => {
+  rollback(targetDir)
   console.log(err);
 })
