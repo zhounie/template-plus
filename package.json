@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "template-plus is a toolkit for quickly building front-end engineering templates, simplifying the process of setting up project structures. It provides pre-configured templates, flexible configuration options, and automated tasks to help you kickstart your front-end development workflow.",
   "main": "index.js",
+  "packageManager": "pnpm@8.6.11",
   "scripts": {
     "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1",
