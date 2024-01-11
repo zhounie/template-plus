@@ -13,7 +13,8 @@
     "build:template": "pnpm -r --filter template-plus build",
     "dev:docs": "pnpm -r --filter docs dev",
     "build:docs": "pnpm -r --filter docs build",
-    "eslint": "eslint"
+    "eslint": "eslint",
+    "release": "npm run build && npm version patch && npm publish"
   },
   "keywords": [],
   "author": "zhounie",
