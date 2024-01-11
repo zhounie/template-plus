@@ -3,9 +3,9 @@
 layout: home
 
 hero:
-  name: "My Awesome Project"
-  text: "A VitePress Site"
-  tagline: My great project tagline
+  name: "TemplatePlus"
+  text: "一站式项目模板"
+  tagline: 简单、快速。一键创建您的项目模版
   actions:
     - theme: brand
       text: Markdown Examples
