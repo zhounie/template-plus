@@ -18,7 +18,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "unbuild && node ./index.js",
     "build": "unbuild",
-    "release": "pnpm run build && pnpm version patch && pnpm publish"
+    "release": "pnpm run build && npm version patch && npm publish"
   },
   "dependencies": {
     "prompts": "^2.4.2"
