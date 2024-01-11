@@ -1,4 +1,3 @@
-import prompts from 'prompts';
 import fs$j from 'node:fs';
 import path$f from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +11,7 @@ import process$1 from 'node:process';
 import os from 'node:os';
 import tty from 'node:tty';
 import require$$0$3 from 'child_process';
+import prompts from 'prompts';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -3807,9 +3807,146 @@ crossSpawn$1.exports._enoent = enoent;
 var crossSpawnExports = crossSpawn$1.exports;
 const crossSpawn = /*@__PURE__*/getDefaultExportFromCjs(crossSpawnExports);
 
-const root = process.cwd();
-const defaultProjectName = "template-plus";
-let targetDir = path$f.resolve(root, defaultProjectName);
+const defaultProjectName$1 = "template-plus";
+let command = {
+  projectName: "",
+  templateType: ""
+};
+let normalizedCommand = {
+  normalized: true,
+  isHusky: true,
+  isEslint: true,
+  isStyleLint: true,
+  isPrettier: true
+};
+let toolsCommand = {
+  customTools: true,
+  axios: true,
+  router: true,
+  store: true
+};
+const commandList = [
+  {
+    name: "projectName",
+    type: "text",
+    message: "\u9879\u76EE\u540D\u79F0: ",
+    initial: defaultProjectName$1
+  },
+  {
+    name: "templateType",
+    message: "\u6A21\u7248\u7C7B\u578B\uFF1A",
+    type: "select",
+    choices: [
+      { title: "vue3-admin", value: "vue3-admin" },
+      { title: "vue3-h5", value: "vue3-h5" }
+    ]
+  }
+];
+const normalizedList = [
+  {
+    name: "normalized",
+    message: "need Normalized code?",
+    type: "toggle",
+    initial: normalizedCommand.normalized,
+    active: "yes",
+    inactive: "no"
+  },
+  {
+    name: "isEslint",
+    message: "  need eslint?",
+    type: "toggle",
+    initial: normalizedCommand.isEslint,
+    active: "yes",
+    inactive: "no"
+  },
+  {
+    name: "isStyleLint",
+    message: "  need style-lint?",
+    type: "toggle",
+    initial: normalizedCommand.isStyleLint,
+    active: "yes",
+    inactive: "no"
+  },
+  {
+    name: "isPrettier",
+    message: "  need prettier?",
+    type: "toggle",
+    initial: normalizedCommand.isPrettier,
+    active: "yes",
+    inactive: "no"
+  },
+  {
+    name: "isHusky",
+    message: "  need husky?",
+    type: "toggle",
+    initial: normalizedCommand.isHusky,
+    active: "yes",
+    inactive: "no"
+  }
+];
+const toolsList = [
+  {
+    name: "customTools",
+    message: "custom tools?",
+    type: "toggle",
+    active: "yes",
+    inactive: "no",
+    initial: toolsCommand.customTools
+  },
+  {
+    name: "axios",
+    message: "  \u9700\u8981Axios?",
+    type: "toggle",
+    active: "yes",
+    inactive: "no",
+    initial: toolsCommand.axios
+  },
+  {
+    name: "router",
+    message: "  \u9700\u8981Router?",
+    type: "toggle",
+    active: "yes",
+    inactive: "no",
+    initial: toolsCommand.router
+  },
+  {
+    name: "store",
+    message: "  \u9700\u8981Store?",
+    type: "toggle",
+    active: "yes",
+    inactive: "no",
+    initial: toolsCommand.store
+  }
+];
+const getCommand = async () => {
+  command = await prompts(commandList, {
+    onCancel() {
+      throw console.log(chalk$1.redBright(`\u5DF2\u53D6\u6D88`));
+    }
+  });
+  normalizedCommand = await prompts(normalizedList, {
+    onSubmit(prompt, answer, answers) {
+      if (prompt.name === "normalized" && answer === false) {
+        return true;
+      }
+    },
+    onCancel() {
+      throw console.log(chalk$1.redBright(`\u5DF2\u53D6\u6D88`));
+    }
+  });
+  toolsCommand = await prompts(toolsList, {
+    onSubmit(prompt, answer, answers) {
+      if (prompt.name === "customTools" && answer === false) {
+        return true;
+      }
+    },
+    onCancel() {
+      throw console.log(chalk$1.redBright(`\u5DF2\u53D6\u6D88`));
+    }
+  });
+  return Object.assign(command, { normalizedCommand }, { toolsCommand });
+};
+
 function mergePkg(pkg, targetPkg) {
   Object.keys(pkg).forEach((key) => {
     if (typeof targetPkg[key] === "string") {
@@ -3823,6 +3960,10 @@ function mergePkg(pkg, targetPkg) {
     }
   });
 }
+
+const root = process.cwd();
+const defaultProjectName = "template-plus";
+let targetDir = path$f.resolve(root, defaultProjectName);
 function getToolPkg(name) {
   const pkgPath = path$f.resolve(root, `tools/${name}/`, "package.json");
   return JSON.parse(fs$j.readFileSync(pkgPath, "utf-8"));
@@ -3874,83 +4015,13 @@ function rollback(dir) {
   fsExtra.removeSync(dir);
 }
 async function init() {
-  let result = {
-    projectName: "",
-    normalized: true
-  };
-  let normalizedResult = {
-    isHusky: true,
-    isEslint: true,
-    isStyleLint: true,
-    isPrettier: true
-  };
-  const list = [
-    {
-      name: "projectName",
-      type: "text",
-      message: "\u9879\u76EE\u540D\u79F0: ",
-      initial: defaultProjectName
-    },
-    {},
-    {},
-    {},
-    {
-      name: "normalized",
-      message: "need Normalized code?",
-      type: "toggle",
-      initial: result.normalized,
-      active: "yes",
-      inactive: "no"
-    }
-  ];
-  const normalizedList = [
-    {
-      name: "isEslint",
-      message: "need eslint?",
-      type: "toggle",
-      initial: normalizedResult.isEslint,
-      active: "yes",
-      inactive: "no"
-    },
-    {
-      name: "isStyleLint",
-      message: "need style-lint?",
-      type: "toggle",
-      initial: normalizedResult.isStyleLint,
-      active: "yes",
-      inactive: "no"
-    },
-    {
-      name: "isPrettier",
-      message: "need prettier?",
-      type: "toggle",
-      initial: normalizedResult.isPrettier,
-      active: "yes",
-      inactive: "no"
-    },
-    {
-      name: "isHusky",
-      message: "need husky?",
-      type: "toggle",
-      initial: normalizedResult.isHusky,
-      active: "yes",
-      inactive: "no"
-    }
-  ];
-  try {
-    result = await prompts(list);
-    if (result.normalized) {
-      normalizedResult = await prompts(normalizedList);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  const resourceDir = path$f.resolve(fileURLToPath(import.meta.url), "../../", "template-admin");
-  targetDir = path$f.resolve(root, result.projectName);
+  const command = await getCommand();
+  const resourceDir = path$f.resolve(fileURLToPath(import.meta.url), "../../", "template", command.templateType);
+  targetDir = path$f.resolve(root, command.projectName);
   fsExtra.copySync(resourceDir, targetDir);
   const pkgPath = path$f.resolve(targetDir, "package.json");
   const pkg = JSON.parse(fs$j.readFileSync(pkgPath, "utf-8"));
-  pkg.name = result.projectName;
+  pkg.name = command.projectName;
   function initTool(name) {
     console.log(chalk$1.blueBright(`init ${name}...`));
     const prettierPkg = getToolPkg(name);
@@ -3963,36 +4034,36 @@ async function init() {
     const lintStagedPkg = getToolPkg("lint-staged");
     mergePkg(lintStagedPkg, pkg2);
     copyToolFile("lint-staged");
-    if (normalizedResult.isEslint) {
+    if (command.normalizedCommand.isEslint) {
       if (Array.isArray(pkg2["lint-staged"]["*.{js,ts,vue}"])) {
         pkg2["lint-staged"]["*.{js,ts,vue}"].push("npm run eslint");
       } else {
         pkg2["lint-staged"]["*.{js,ts,vue}"] = ["npm run eslint"];
       }
     }
-    if (normalizedResult.isPrettier) {
+    if (command.normalizedCommand.isPrettier) {
       if (Array.isArray(pkg2["lint-staged"]["*.{js,ts,vue}"])) {
         pkg2["lint-staged"]["*.{js,ts,vue}"].push("npm run prettier");
       } else {
         pkg2["lint-staged"]["*.{js,ts,vue}"] = ["npm run prettier"];
       }
     }
-    if (normalizedResult.isStyleLint) {
+    if (command.normalizedCommand.isStyleLint) {
       pkg2["lint-staged"]["*.{vue,css,scss}"] = ["npm run stylelint"];
     }
     console.log(chalk$1.blueBright("init lint-staged success."));
   }
-  if (result.normalized) {
-    if (normalizedResult.isPrettier) {
+  if (command.normalizedCommand.normalized) {
+    if (command.normalizedCommand.isPrettier) {
       initTool("prettier");
     }
-    if (normalizedResult.isEslint) {
+    if (command.normalizedCommand.isEslint) {
       initTool("eslint");
     }
-    if (normalizedResult.isStyleLint) {
+    if (command.normalizedCommand.isStyleLint) {
       initTool("stylelint");
     }
-    if (normalizedResult.isHusky) {
+    if (command.normalizedCommand.isHusky) {
       try {
         await initGit(targetDir);
       } catch (error) {
@@ -4005,7 +4076,7 @@ async function init() {
   fs$j.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), "utf-8");
   const gitignore = path$f.resolve(targetDir, "gitignore");
   fs$j.renameSync(gitignore, path$f.resolve(targetDir, ".gitignore"));
-  console.log(chalk$1.greenBright.bold(`1. cd ${result.projectName}`));
+  console.log(chalk$1.greenBright.bold(`1. cd ${command.projectName}`));
   console.log(chalk$1.greenBright.bold(`2. npm install`));
 }
 init().catch((err) => {

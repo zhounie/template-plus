@@ -1,31 +1,17 @@
-import prompts from 'prompts'
+
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fsExtra from 'fs-extra'
 import chalk from 'chalk'
 import crossSpawn from 'cross-spawn'
-
+import { getCommand } from './getCommand'
+import { mergePkg } from './utils/index'
 
 const root = process.cwd()
 
 const defaultProjectName = 'template-plus'
 let targetDir = path.resolve(root, defaultProjectName)
-
-// 合并package.json
-function mergePkg (pkg, targetPkg) {
-  Object.keys(pkg).forEach(key => {
-    if (typeof targetPkg[key] === 'string') {
-      targetPkg[key] = pkg[key]
-    } else if (Object.prototype.toString.call(targetPkg[key]) === '[object Object]') {
-      if (Object.prototype.toString.call(targetPkg[key]) === '[object Object]') {
-        targetPkg[key] = Object.assign(targetPkg[key], pkg[key])
-      }
-    } else {
-      targetPkg[key] = pkg[key]
-    }
-  })
-}
 
 function getToolPkg (name) {
   const pkgPath = path.resolve(root, `tools/${name}/`, 'package.json')
@@ -85,88 +71,11 @@ function rollback(dir) {
 }
 
 async function init() {
-  let result = {
-    projectName: '',
-    normalized: true
-  }
-  let normalizedResult = {
-    isHusky: true,
-    isEslint: true,
-    isStyleLint: true,
-    isPrettier: true
-  }
-
-  const list = [
-    {
-      name: 'projectName',
-      type: 'text',
-      message: '项目名称: ',
-      initial: defaultProjectName,
-    },
-    {
-
-    },
-    {
-      
-    },
-    {
-      
-    },
-    {
-      name: 'normalized',
-      message: 'need Normalized code?',
-      type: 'toggle',
-      initial: result.normalized,
-      active: 'yes',
-      inactive: 'no'
-    }
-  ]
-
-  const normalizedList = [
-    {
-      name: 'isEslint',
-      message: 'need eslint?',
-      type: 'toggle',
-      initial: normalizedResult.isEslint,
-      active: 'yes',
-      inactive: 'no'
-    },
-    {
-      name: 'isStyleLint',
-      message: 'need style-lint?',
-      type: 'toggle',
-      initial: normalizedResult.isStyleLint,
-      active: 'yes',
-      inactive: 'no'
-    },
-    {
-      name: 'isPrettier',
-      message: 'need prettier?',
-      type: 'toggle',
-      initial: normalizedResult.isPrettier,
-      active: 'yes',
-      inactive: 'no'
-    },
-    {
-      name: 'isHusky',
-      message: 'need husky?',
-      type: 'toggle',
-      initial: normalizedResult.isHusky,
-      active: 'yes',
-      inactive: 'no'
-    }
-  ]
-  try {
-    result = await prompts(list);
-    if (result.normalized) {
-      normalizedResult = await prompts(normalizedList);
-    }
-  } catch (error) {
-    console.log(error);
-  }
   
-  const resourceDir = path.resolve(fileURLToPath(import.meta.url), '../../', 'template-admin')
-  targetDir = path.resolve(root, result.projectName)
+  const command = await getCommand()
+
+  const resourceDir = path.resolve(fileURLToPath(import.meta.url), '../../', 'template', command.templateType)
+  targetDir = path.resolve(root, command.projectName)
 
   // 复制文件夹
   fsExtra.copySync(resourceDir, targetDir)
@@ -174,7 +83,7 @@ async function init() {
   // 获取package文件
   const pkgPath = path.resolve(targetDir, 'package.json')
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"))
-  pkg.name = result.projectName
+  pkg.name = command.projectName
 
   function initTool(name) {
     console.log(chalk.blueBright(`init ${name}...`));
@@ -198,40 +107,40 @@ async function init() {
     // "*.{vue,css,scss}": [
     //   "npm run stylelint"
     // ]
-    if (normalizedResult.isEslint) {
+    if (command.normalizedCommand.isEslint) {
       if (Array.isArray(pkg['lint-staged']['*.{js,ts,vue}'])) {
         pkg['lint-staged']['*.{js,ts,vue}'].push('npm run eslint')
       } else {
         pkg['lint-staged']['*.{js,ts,vue}'] = ['npm run eslint']
       }
     }
-    if (normalizedResult.isPrettier) {
+    if (command.normalizedCommand.isPrettier) {
       if (Array.isArray(pkg['lint-staged']['*.{js,ts,vue}'])) {
         pkg['lint-staged']['*.{js,ts,vue}'].push('npm run prettier')
       } else {
         pkg['lint-staged']['*.{js,ts,vue}'] = ['npm run prettier']
       }
     }
-    if (normalizedResult.isStyleLint) {
+    if (command.normalizedCommand.isStyleLint) {
       pkg['lint-staged']['*.{vue,css,scss}'] = ['npm run stylelint']
     }
     console.log(chalk.blueBright("init lint-staged success."));
   }
 
-  if (result.normalized) {
-    if (normalizedResult.isPrettier) {
+  if (command.normalizedCommand.normalized) {
+    if (command.normalizedCommand.isPrettier) {
       initTool('prettier')
     }
 
-    if (normalizedResult.isEslint) {
+    if (command.normalizedCommand.isEslint) {
       initTool('eslint')
     }
 
-    if (normalizedResult.isStyleLint) {
+    if (command.normalizedCommand.isStyleLint) {
       initTool('stylelint')
     }
 
-    if (normalizedResult.isHusky) {
+    if (command.normalizedCommand.isHusky) {
       // 初始化git
       try {
         await initGit(targetDir)
@@ -249,7 +158,7 @@ async function init() {
   const gitignore = path.resolve(targetDir, 'gitignore')
   fs.renameSync(gitignore, path.resolve(targetDir, '.gitignore'))
 
-  console.log(chalk.greenBright.bold(`1. cd ${result.projectName}`))
+  console.log(chalk.greenBright.bold(`1. cd ${command.projectName}`))
   console.log(chalk.greenBright.bold(`2. npm install`));
   
 }

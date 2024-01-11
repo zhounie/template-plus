@@ -4,9 +4,11 @@
   "description": "template-plus is a toolkit for quickly building front-end engineering templates, simplifying the process of setting up project structures. It provides pre-configured templates, flexible configuration options, and automated tasks to help you kickstart your front-end development workflow.",
   "main": "index.js",
   "packageManager": "pnpm@8.6.11",
+  "type": "module",
   "scripts": {
     "prepare": "husky install",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
+    "test:cov": "vitest --coverage",
     "dev:template": "pnpm -r --filter template-plus dev",
     "build:template": "pnpm -r --filter template-plus build",
     "dev:docs": "pnpm -r --filter docs dev",
@@ -18,10 +20,13 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.4.9",
+    "@types/prompts": "^2.4.9",
+    "@vitest/coverage-v8": "^1.1.1",
     "eslint": "^8.46.0",
     "husky": "^8.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^1.1.1"
   },
   "dependencies": {
     "chalk": "^5.3.0",
