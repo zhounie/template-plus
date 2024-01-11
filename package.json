@@ -14,7 +14,7 @@
     "dev:docs": "pnpm -r --filter docs dev",
     "build:docs": "pnpm -r --filter docs build",
     "eslint": "eslint",
-    "release": "pnpm run build:template && npm version patch && npm publish"
+    "release": "pnpm -r --filter template-plus release"
   },
   "keywords": [],
   "author": "zhounie",
