@@ -8,18 +8,21 @@ hero:
   tagline: 简单、快速。一键创建您的项目模版
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: 快速开始
+      link: /guide/getting-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: GitHub
+      link: https://github.com/zhounie/template-plus
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 丰富的功能
+    icon: 🛠
+    details: 对 Axios、Store、Router 等支持开箱即用。
+  - title: 快速创建
+    icon: 🚀
+    details: 快速构建前端工程模板。
+  - title: 代码规范
+    icon: 📜
+    details: 使用Eslint、StyleLint、Prettier美化您的代码。
 ---
 
