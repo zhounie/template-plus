@@ -1,7 +1,7 @@
 {
   "name": "template-plus",
   "type": "module",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "template-plus is a toolkit for quickly building front-end engineering templates, simplifying the process of setting up project structures. It provides pre-configured templates, flexible configuration options, and automated tasks to help you kickstart your front-end development workflow.",
   "author": "zhounie",
   "license": "MIT",
