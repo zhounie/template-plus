@@ -22,7 +22,7 @@ npm install -g template-plus
 
 To create a new project, run the following command and follow the prompts:
 ```
-template-plus
+npx template-plus init
 ```
 
 For more advanced usage and customization options, please refer to the [Documentation]([link-to-documentation](https://github.com/zhounie/template-plus)) section.

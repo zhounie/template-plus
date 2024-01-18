@@ -16,5 +16,5 @@ $ yarn add template-plus -g
 
 ## 安装向导
 ``` sh[npm]
-$ npx template-plus
+$ npx template-plus init
 ```
