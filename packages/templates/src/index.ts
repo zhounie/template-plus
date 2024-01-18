@@ -163,9 +163,9 @@ async function init() {
   
 }
 
-
-
-init().catch((err) => {
-  rollback(targetDir)
-  console.log(err);
-})
+export default () => {
+  init().catch((err) => {
+    rollback(targetDir)
+    console.log(err);
+  })
+}
