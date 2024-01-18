@@ -4079,11 +4079,7 @@ async function init() {
   console.log(chalk$1.greenBright.bold(`1. cd ${command.projectName}`));
   console.log(chalk$1.greenBright.bold(`2. npm install`));
 }
-const index = () => {
-  init().catch((err) => {
-    rollback(targetDir);
-    console.log(err);
-  });
-};
-
-export { index as default };
+init().catch((err) => {
+  rollback(targetDir);
+  console.log(err);
+});

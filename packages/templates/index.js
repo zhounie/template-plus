@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
 import { program } from 'commander'
-import init from './dist/index.mjs'
-import pck from './package.json' assert { type: 'json'}
+import fs from 'node:fs'
+
+const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 
 program
-    .version(pck.version)
-
+    .version(pkg.version)
 
 program
     .command('init')
-    .action((name) => {
-        init()
+    .action(async (name) => {
+        await import('./dist/index.mjs')
     })
     
 program.parse()
