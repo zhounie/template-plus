@@ -8,18 +8,20 @@ import crossSpawn from 'cross-spawn'
 import { getCommand } from './getCommand'
 import { mergePkg } from './utils/index'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 const root = process.cwd()
 
 const defaultProjectName = 'template-plus'
 let targetDir = path.resolve(root, defaultProjectName)
 
 function getToolPkg (name) {
-  const pkgPath = path.resolve(root, `tools/${name}/`, 'package.json')
+  const pkgPath = path.resolve(__dirname, '..', `tools/${name}/`, 'package.json')
   return JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
 }
 
 function copyToolFile(name) {
-  const dir = path.resolve(root, `tools/${name}`, 'src')
+  const dir = path.resolve(__dirname, '..', `tools/${name}`, 'src')
   if (fsExtra.existsSync(dir)) {
     fsExtra.copySync(dir, targetDir)
   }

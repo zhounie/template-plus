@@ -3961,15 +3961,16 @@ function mergePkg(pkg, targetPkg) {
   });
 }
 
+const __dirname = path$f.dirname(fileURLToPath(import.meta.url));
 const root = process.cwd();
 const defaultProjectName = "template-plus";
 let targetDir = path$f.resolve(root, defaultProjectName);
 function getToolPkg(name) {
-  const pkgPath = path$f.resolve(root, `tools/${name}/`, "package.json");
+  const pkgPath = path$f.resolve(__dirname, "..", `tools/${name}/`, "package.json");
   return JSON.parse(fs$j.readFileSync(pkgPath, "utf-8"));
 }
 function copyToolFile(name) {
-  const dir = path$f.resolve(root, `tools/${name}`, "src");
+  const dir = path$f.resolve(__dirname, "..", `tools/${name}`, "src");
   if (fsExtra.existsSync(dir)) {
     fsExtra.copySync(dir, targetDir);
   }
