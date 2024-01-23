@@ -11,7 +11,7 @@
   },
   "files": [
     "dist",
-    "template-admin",
+    "template",
     "index.js"
   ],
   "scripts": {
