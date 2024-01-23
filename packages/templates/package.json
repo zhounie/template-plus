@@ -12,6 +12,7 @@
   "files": [
     "dist",
     "template",
+    "tools",
     "index.js"
   ],
   "scripts": {
