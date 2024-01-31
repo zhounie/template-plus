@@ -13,7 +13,8 @@
     "dist",
     "template",
     "tools",
-    "index.js"
+    "index.js",
+    "!template/**/node_modules"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
